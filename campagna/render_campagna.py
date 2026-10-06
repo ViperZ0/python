@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Renderizza una campagna di gioco di ruolo (JSON) in una pagina HTML autonoma.
 
-Uso: python render_campagna.py [campagna.json] [-o campagna.html]
+Uso: python render_campagna.py [campagna.json] [-o campagna.html] [--nuovo]
 """
 import argparse
 import base64
@@ -140,11 +140,32 @@ def render(c, base=Path(".")):
 <main>{corpo}</main></body></html>"""
 
 
+MODELLO = {
+    "titolo": "Titolo della campagna",
+    "sistema": "",
+    "descrizione": "",
+    "mappa": {"nome": "Mappa", "immagine": ""},
+    "luoghi": [], "fazioni": [], "png": [], "oggetti": [],
+    "quest": [], "timeline": [], "sessioni": [],
+}
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("input", nargs="?", default="campagna.json")
     ap.add_argument("-o", "--output", default="campagna.html")
+    ap.add_argument("--nuovo", action="store_true",
+                    help="crea un file JSON vuoto da compilare (non sovrascrive)")
     args = ap.parse_args()
+    if args.nuovo:
+        if Path(args.input).exists():
+            ap.error(f"{args.input} esiste già, non lo sovrascrivo")
+        Path(args.input).write_text(
+            json.dumps(MODELLO, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"Creato modello vuoto: {args.input}")
+        return
+    if not Path(args.input).exists():
+        ap.error(f"{args.input} non trovato; creane uno vuoto con: --nuovo")
     dati = json.loads(Path(args.input).read_text(encoding="utf-8"))
     Path(args.output).write_text(render(dati, Path(args.input).resolve().parent), encoding="utf-8")
     print(f"Creato {args.output}")
