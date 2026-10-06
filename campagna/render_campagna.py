@@ -4,7 +4,9 @@
 Uso: python render_campagna.py [campagna.json] [-o campagna.html]
 """
 import argparse
+import base64
 import json
+import mimetypes
 from html import escape
 from pathlib import Path
 
@@ -27,6 +29,9 @@ border-radius:99px;padding:0 .6rem;margin:0 .3rem .3rem 0}
 .tl .card{margin-left:1.2rem;position:relative}
 .tl .card::before{content:"";position:absolute;left:-1.7rem;top:1.2rem;width:12px;height:12px;
 background:var(--accent);border-radius:50%}
+.map{width:100%;height:auto;border-radius:8px;background:#2a231c}
+.map text{fill:var(--ink);font:14px Georgia,serif;paint-order:stroke;stroke:#000;stroke-width:3px}
+.map circle{fill:var(--accent);stroke:#000;stroke-width:2}
 .mute{color:var(--mute);font-size:.9rem}
 """
 
@@ -41,7 +46,33 @@ def sezione(id_, titolo, righe):
     return f'<section id="{id_}"><h2>{titolo}</h2>{"".join(righe)}</section>'
 
 
-def render(c):
+def render_mappa(c, base):
+    """SVG con sfondo (immagine opzionale) e un segnaposto per ogni luogo con x/y (0-100)."""
+    m = c.get("mappa")
+    if not m:
+        return []
+    w, h = m.get("larghezza", 1000), m.get("altezza", 600)
+    sfondo = ""
+    if m.get("immagine"):
+        p = Path(m["immagine"])
+        if not p.is_absolute():
+            p = base / p
+        tipo = mimetypes.guess_type(p.name)[0] or "image/png"
+        b64 = base64.b64encode(p.read_bytes()).decode()
+        sfondo = (f'<image href="data:{tipo};base64,{b64}" width="{w}" height="{h}" '
+                  'preserveAspectRatio="xMidYMid slice"/>')
+    segnaposto = "".join(
+        f'<g><circle cx="{l["x"] * w / 100:.0f}" cy="{l["y"] * h / 100:.0f}" r="9"/>'
+        f'<text x="{l["x"] * w / 100 + 14:.0f}" y="{l["y"] * h / 100 + 5:.0f}">'
+        f'{escape(l["nome"])}</text></g>'
+        for l in c.get("luoghi", []) if "x" in l and "y" in l
+    )
+    nome = escape(m.get("nome", "Mappa"))
+    return [f'<svg class="map" viewBox="0 0 {w} {h}" role="img" aria-label="{nome}">'
+            f'<rect width="{w}" height="{h}" fill="#2a231c"/>{sfondo}{segnaposto}</svg>']
+
+
+def render(c, base=Path(".")):
     sessioni = [
         f'<div class="card"><h3>Sessione {escape(str(s.get("numero", "?")))}: '
         f'{escape(s.get("titolo", ""))}</h3>'
@@ -87,6 +118,7 @@ def render(c):
         for o in c.get("oggetti", [])
     ]
     corpo = "".join([
+        sezione("mappa", "Mappa", render_mappa(c, base)),
         sezione("sessioni", "Sessioni", sessioni),
         sezione("luoghi", "Luoghi", luoghi),
         sezione("fazioni", "Fazioni", fazioni),
@@ -102,7 +134,7 @@ def render(c):
 <title>{titolo}</title><style>{CSS}</style></head><body>
 <header><h1>{titolo}</h1><div class="sub">{escape(c.get("sistema", ""))}</div>
 <p>{escape(c.get("descrizione", ""))}</p></header>
-<nav><a href="#sessioni">Sessioni</a><a href="#luoghi">Luoghi</a>
+<nav><a href="#mappa">Mappa</a><a href="#sessioni">Sessioni</a><a href="#luoghi">Luoghi</a>
 <a href="#fazioni">Fazioni</a><a href="#png">PNG</a>
 <a href="#oggetti">Oggetti</a><a href="#quest">Quest</a><a href="#timeline">Timeline</a></nav>
 <main>{corpo}</main></body></html>"""
@@ -114,7 +146,7 @@ def main():
     ap.add_argument("-o", "--output", default="campagna.html")
     args = ap.parse_args()
     dati = json.loads(Path(args.input).read_text(encoding="utf-8"))
-    Path(args.output).write_text(render(dati), encoding="utf-8")
+    Path(args.output).write_text(render(dati, Path(args.input).resolve().parent), encoding="utf-8")
     print(f"Creato {args.output}")
 
 

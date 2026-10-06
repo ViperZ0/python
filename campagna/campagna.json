@@ -6,12 +6,16 @@
     {
       "nome": "Valdrath",
       "tipo": "Città",
-      "descrizione": "Capitale decaduta, avvolta da una nebbia color cenere."
+      "descrizione": "Capitale decaduta, avvolta da una nebbia color cenere.",
+      "x": 62,
+      "y": 45
     },
     {
       "nome": "Foresta di Mornea",
       "tipo": "Foresta",
-      "descrizione": "Boschi antichi dove gli alberi sembrano ascoltare."
+      "descrizione": "Boschi antichi dove gli alberi sembrano ascoltare.",
+      "x": 28,
+      "y": 60
     }
   ],
   "fazioni": [
@@ -121,5 +125,8 @@
       "possessore": "Maelis Voss",
       "descrizione": "Rivela le impronte lasciate dagli spiriti della foresta."
     }
-  ]
+  ],
+  "mappa": {
+    "nome": "Il Regno di Valdrath"
+  }
 }
