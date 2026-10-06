@@ -3,19 +3,107 @@
   "sistema": "D&D 5e",
   "descrizione": "Un regno in rovina, un antico sigillo che si spezza e un gruppo di sopravvissuti che deve decidere a chi giurare fedeltà.",
   "luoghi": [
-    {"nome": "Valdrath", "tipo": "Città", "descrizione": "Capitale decaduta, avvolta da una nebbia color cenere."},
-    {"nome": "Foresta di Mornea", "tipo": "Foresta", "descrizione": "Boschi antichi dove gli alberi sembrano ascoltare."}
+    {
+      "nome": "Valdrath",
+      "tipo": "Città",
+      "descrizione": "Capitale decaduta, avvolta da una nebbia color cenere."
+    },
+    {
+      "nome": "Foresta di Mornea",
+      "tipo": "Foresta",
+      "descrizione": "Boschi antichi dove gli alberi sembrano ascoltare."
+    }
   ],
   "fazioni": [
-    {"nome": "Ordine della Fiamma Pallida", "obiettivo": "Ripristinare il sigillo a ogni costo.", "atteggiamento": "Ambiguo"},
-    {"nome": "Corte dei Corvi", "obiettivo": "Spezzare definitivamente il sigillo.", "atteggiamento": "Ostile"}
+    {
+      "nome": "Ordine della Fiamma Pallida",
+      "obiettivo": "Ripristinare il sigillo a ogni costo.",
+      "atteggiamento": "Ambiguo"
+    },
+    {
+      "nome": "Corte dei Corvi",
+      "obiettivo": "Spezzare definitivamente il sigillo.",
+      "atteggiamento": "Ostile"
+    }
   ],
   "png": [
-    {"nome": "Maelis Voss", "ruolo": "Archivista", "fazione": "Ordine della Fiamma Pallida", "note": "Conosce il rituale ma mente sul prezzo."},
-    {"nome": "Corvo Grigio", "ruolo": "Spia", "fazione": "Corte dei Corvi", "note": "Vende informazioni a chiunque."}
+    {
+      "nome": "Maelis Voss",
+      "ruolo": "Archivista",
+      "fazione": "Ordine della Fiamma Pallida",
+      "note": "Conosce il rituale ma mente sul prezzo."
+    },
+    {
+      "nome": "Corvo Grigio",
+      "ruolo": "Spia",
+      "fazione": "Corte dei Corvi",
+      "note": "Vende informazioni a chiunque."
+    }
   ],
   "sessioni": [
-    {"numero": 1, "titolo": "Il risveglio", "data": "2026-01-10", "riassunto": "Il gruppo si incontra a Valdrath e trova il primo frammento del sigillo.", "luoghi": ["Valdrath"], "png": ["Maelis Voss"]},
-    {"numero": 2, "titolo": "Ombre tra gli alberi", "data": "2026-01-24", "riassunto": "Inseguimento nella Foresta di Mornea e primo scontro con la Corte dei Corvi.", "luoghi": ["Foresta di Mornea"], "png": ["Corvo Grigio"]}
+    {
+      "numero": 1,
+      "titolo": "Il risveglio",
+      "data": "2026-01-10",
+      "riassunto": "Il gruppo si incontra a Valdrath e trova il primo frammento del sigillo.",
+      "luoghi": [
+        "Valdrath"
+      ],
+      "png": [
+        "Maelis Voss"
+      ]
+    },
+    {
+      "numero": 2,
+      "titolo": "Ombre tra gli alberi",
+      "data": "2026-01-24",
+      "riassunto": "Inseguimento nella Foresta di Mornea e primo scontro con la Corte dei Corvi.",
+      "luoghi": [
+        "Foresta di Mornea"
+      ],
+      "png": [
+        "Corvo Grigio"
+      ]
+    }
+  ],
+  "quest": [
+    {
+      "titolo": "Il primo frammento",
+      "stato": "Completata",
+      "assegnata_da": "Maelis Voss",
+      "descrizione": "Recuperare il primo frammento del sigillo nelle rovine di Valdrath.",
+      "ricompensa": "500 monete d'oro"
+    },
+    {
+      "titolo": "Il segreto dei Corvi",
+      "stato": "In corso",
+      "assegnata_da": "Corvo Grigio",
+      "descrizione": "Scoprire dove la Corte dei Corvi nasconde il secondo frammento.",
+      "ricompensa": "Un favore della Corte"
+    },
+    {
+      "titolo": "Il prezzo del rituale",
+      "stato": "Non iniziata",
+      "assegnata_da": "Maelis Voss",
+      "descrizione": "Scoprire cosa richiede davvero il rituale di riparazione.",
+      "ricompensa": "Sconosciuta"
+    }
+  ],
+  "timeline": [
+    {
+      "data": "Anno -300",
+      "titolo": "La posa del sigillo",
+      "descrizione": "I magi di Valdrath imprigionano l'Antico sotto la città."
+    },
+    {
+      "data": "Anno -12",
+      "titolo": "La caduta di Valdrath",
+      "descrizione": "Una crepa nel sigillo copre il regno di cenere."
+    },
+    {
+      "data": "Anno 0",
+      "titolo": "Il risveglio",
+      "descrizione": "Il gruppo si incontra e trova il primo frammento."
+    }
   ]
 }

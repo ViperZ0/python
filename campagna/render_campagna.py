@@ -23,6 +23,10 @@ h2{color:var(--accent);border-bottom:1px solid var(--mute);padding-bottom:.3rem;
 .card h3{margin:0 0 .3rem}
 .tag{display:inline-block;font-size:.8rem;border:1px solid var(--accent);color:var(--accent);
 border-radius:99px;padding:0 .6rem;margin:0 .3rem .3rem 0}
+.tl{border-left:2px solid var(--accent);margin-left:.5rem}
+.tl .card{margin-left:1.2rem;position:relative}
+.tl .card::before{content:"";position:absolute;left:-1.7rem;top:1.2rem;width:12px;height:12px;
+background:var(--accent);border-radius:50%}
 .mute{color:var(--mute);font-size:.9rem}
 """
 
@@ -62,11 +66,26 @@ def render(c):
         f'<p>{escape(p.get("note", ""))}</p></div>'
         for p in c.get("png", [])
     ]
+    quest = [
+        f'<div class="card"><h3>{escape(q["titolo"])}</h3>{tags([q.get("stato", "")])}'
+        f'<div class="mute">Assegnata da: {escape(q.get("assegnata_da", "-"))}</div>'
+        f'<p>{escape(q.get("descrizione", ""))}</p>'
+        f'<div class="mute">Ricompensa: {escape(q.get("ricompensa", "-"))}</div></div>'
+        for q in c.get("quest", [])
+    ]
+    timeline = [
+        f'<div class="card"><h3>{escape(e["titolo"])}</h3>'
+        f'<div class="mute">{escape(e.get("data", ""))}</div>'
+        f'<p>{escape(e.get("descrizione", ""))}</p></div>'
+        for e in c.get("timeline", [])
+    ]
     corpo = "".join([
         sezione("sessioni", "Sessioni", sessioni),
         sezione("luoghi", "Luoghi", luoghi),
         sezione("fazioni", "Fazioni", fazioni),
         sezione("png", "PNG", png),
+        sezione("quest", "Quest", quest),
+        sezione("timeline", "Timeline", [f'<div class="tl">{"".join(timeline)}</div>'] if timeline else []),
     ])
     titolo = escape(c.get("titolo", "Campagna"))
     return f"""<!doctype html>
@@ -76,7 +95,8 @@ def render(c):
 <header><h1>{titolo}</h1><div class="sub">{escape(c.get("sistema", ""))}</div>
 <p>{escape(c.get("descrizione", ""))}</p></header>
 <nav><a href="#sessioni">Sessioni</a><a href="#luoghi">Luoghi</a>
-<a href="#fazioni">Fazioni</a><a href="#png">PNG</a></nav>
+<a href="#fazioni">Fazioni</a><a href="#png">PNG</a>
+<a href="#quest">Quest</a><a href="#timeline">Timeline</a></nav>
 <main>{corpo}</main></body></html>"""
 
 
