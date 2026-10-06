@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Modulo campagna</title>
+<style>
+:root{--bg:#14110f;--card:#211c18;--ink:#e8dfd3;--accent:#c9893b;--mute:#9a8f82}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Georgia,serif}
+header{padding:1.5rem 1rem;text-align:center;border-bottom:2px solid var(--accent)}
+h1{margin:0;color:var(--accent)}
+main{max-width:800px;margin:auto;padding:0 1rem 6rem}
+h2{color:var(--accent);border-bottom:1px solid var(--mute);margin-top:2rem}
+.card{background:var(--card);border-radius:8px;padding:.8rem 1rem;margin:.8rem 0}
+label{display:block;font-size:.85rem;color:var(--mute);margin-top:.5rem}
+input,textarea{width:100%;background:#2a231c;color:var(--ink);border:1px solid #4a3f33;
+border-radius:4px;padding:.4rem;font:inherit}
+textarea{min-height:4rem}
+button{background:var(--accent);color:#14110f;border:0;border-radius:4px;padding:.5rem 1rem;
+font:inherit;cursor:pointer}
+button.sec{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.row{display:flex;gap:.5rem}.row>div{flex:1}
+.bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);padding:.7rem;
+display:flex;gap:.6rem;justify-content:center;border-top:2px solid var(--accent)}
+.hint{color:var(--mute);font-size:.85rem}
+</style></head><body>
+<header><h1>Modulo campagna</h1>
+<div class="hint">Compila i campi, poi premi «Scarica campagna.json» e mettilo accanto a render_campagna.py</div></header>
+<main id="main"></main>
+<div class="bar">
+<button id="salva">Scarica campagna.json</button>
+<label class="sec" style="margin:0"><button class="sec" onclick="document.getElementById('file').click()">Carica un JSON esistente</button></label>
+<input type="file" id="file" accept=".json" hidden>
+</div>
+<script>
+// Definizione dei campi: [chiave, etichetta, tipo]  tipo: t=testo, a=area, n=numero, l=lista (separata da virgole)
+const SEZIONI = {
+  luoghi:   {titolo:"Luoghi",   campi:[["nome","Nome","t"],["tipo","Tipo (città, foresta...)","t"],["descrizione","Descrizione","a"],["x","Posizione sulla mappa X (0-100)","n"],["y","Posizione sulla mappa Y (0-100)","n"]]},
+  fazioni:  {titolo:"Fazioni",  campi:[["nome","Nome","t"],["obiettivo","Obiettivo","a"],["atteggiamento","Atteggiamento (alleato, ostile...)","t"]]},
+  png:      {titolo:"PNG",      campi:[["nome","Nome","t"],["ruolo","Ruolo","t"],["fazione","Fazione","t"],["note","Note","a"]]},
+  oggetti:  {titolo:"Oggetti",  campi:[["nome","Nome","t"],["tipo","Tipo","t"],["rarità","Rarità","t"],["possessore","Possessore","t"],["descrizione","Descrizione","a"]]},
+  quest:    {titolo:"Quest",    campi:[["titolo","Titolo","t"],["stato","Stato (non iniziata, in corso, completata)","t"],["assegnata_da","Assegnata da","t"],["descrizione","Descrizione","a"],["ricompensa","Ricompensa","t"]]},
+  timeline: {titolo:"Timeline", campi:[["data","Data","t"],["titolo","Titolo","t"],["descrizione","Descrizione","a"]]},
+  sessioni: {titolo:"Sessioni", campi:[["numero","Numero","n"],["titolo","Titolo","t"],["data","Data","t"],["riassunto","Riassunto","a"],["luoghi","Luoghi visitati (separati da virgola)","l"],["png","PNG incontrati (separati da virgola)","l"]]}
+};
+const CHIAVE = "campagna-modulo-v1";
+let dati = {titolo:"", sistema:"", descrizione:"", mappa:{nome:"Mappa", immagine:""}};
+for (const k in SEZIONI) dati[k] = [];
+
+const el = (t, p = {}, ...figli) => {
+  const e = Object.assign(document.createElement(t), p);
+  figli.forEach(f => e.append(f)); return e;
+};
+
+function campo(obj, [chiave, etichetta, tipo]) {
+  const v = obj[chiave];
+  const val = tipo === "l" ? (v || []).join(", ") : (v ?? "");
+  const inp = el(tipo === "a" ? "textarea" : "input", {value: val});
+  if (tipo === "n") inp.type = "number";
+  inp.oninput = () => {
+    if (tipo === "n") { if (inp.value === "") delete obj[chiave]; else obj[chiave] = Number(inp.value); }
+    else if (tipo === "l") obj[chiave] = inp.value.split(",").map(s => s.trim()).filter(Boolean);
+    else obj[chiave] = inp.value;
+    autosalva();
+  };
+  return el("div", {}, el("label", {textContent: etichetta}), inp);
+}
+
+function disegna() {
+  const main = document.getElementById("main"); main.replaceChildren();
+  main.append(el("h2", {textContent: "Informazioni generali"}));
+  const g = el("div", {className: "card"});
+  [["titolo","Titolo della campagna","t"],["sistema","Sistema di gioco","t"],["descrizione","Descrizione","a"]]
+    .forEach(c => g.append(campo(dati, c)));
+  main.append(g);
+  main.append(el("h2", {textContent: "Mappa"}));
+  const m = el("div", {className: "card"});
+  dati.mappa ||= {};
+  m.append(campo(dati.mappa, ["nome","Nome della mappa","t"]),
+           campo(dati.mappa, ["immagine","Nome del file immagine (es. mappa.png, nella stessa cartella)","t"]));
+  main.append(m);
+  for (const [chiave, s] of Object.entries(SEZIONI)) {
+    main.append(el("h2", {textContent: s.titolo}));
+    (dati[chiave] ||= []).forEach((voce, i) => {
+      const c = el("div", {className: "card"});
+      s.campi.forEach(cm => c.append(campo(voce, cm)));
+      c.append(el("p", {}, el("button", {className: "sec", textContent: "Elimina",
+        onclick: () => { if (confirm("Eliminare questa voce?")) { dati[chiave].splice(i, 1); autosalva(); disegna(); } }})));
+      main.append(c);
+    });
+    main.append(el("button", {textContent: "+ Aggiungi " + s.titolo.toLowerCase(),
+      onclick: () => { dati[chiave].push({}); autosalva(); disegna(); }}));
+  }
+}
+
+function autosalva() { try { localStorage.setItem(CHIAVE, JSON.stringify(dati)); } catch (e) {} }
+
+document.getElementById("salva").onclick = () => {
+  const pulito = JSON.parse(JSON.stringify(dati));
+  for (const k in SEZIONI) pulito[k] = pulito[k].filter(v => Object.values(v).some(x => x !== "" && x?.length !== 0));
+  if (!pulito.mappa?.immagine) delete pulito.mappa.immagine;
+  const blob = new Blob([JSON.stringify(pulito, null, 2)], {type: "application/json"});
+  const a = el("a", {href: URL.createObjectURL(blob), download: "campagna.json"});
+  a.click(); URL.revokeObjectURL(a.href);
+};
+
+document.getElementById("file").onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try { dati = Object.assign(dati, JSON.parse(await f.text())); autosalva(); disegna(); }
+  catch (err) { alert("File JSON non valido: " + err.message); }
+};
+
+try { const s = localStorage.getItem(CHIAVE); if (s) dati = Object.assign(dati, JSON.parse(s)); } catch (e) {}
+disegna();
+</script></body></html>
