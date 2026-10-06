@@ -105,5 +105,21 @@
       "titolo": "Il risveglio",
       "descrizione": "Il gruppo si incontra e trova il primo frammento."
     }
+  ],
+  "oggetti": [
+    {
+      "nome": "Frammento del Sigillo",
+      "tipo": "Manufatto",
+      "rarità": "Leggendario",
+      "possessore": "Il gruppo",
+      "descrizione": "Un pezzo di cristallo nero che pulsa debolmente al contatto con la magia."
+    },
+    {
+      "nome": "Lanterna di Mornea",
+      "tipo": "Oggetto magico",
+      "rarità": "Non comune",
+      "possessore": "Maelis Voss",
+      "descrizione": "Rivela le impronte lasciate dagli spiriti della foresta."
+    }
   ]
 }

@@ -79,11 +79,19 @@ def render(c):
         f'<p>{escape(e.get("descrizione", ""))}</p></div>'
         for e in c.get("timeline", [])
     ]
+    oggetti = [
+        f'<div class="card"><h3>{escape(o["nome"])}</h3>'
+        f'{tags([o.get("tipo", ""), o.get("rarità", "")])}'
+        f'<div class="mute">Possessore: {escape(o.get("possessore", "-"))}</div>'
+        f'<p>{escape(o.get("descrizione", ""))}</p></div>'
+        for o in c.get("oggetti", [])
+    ]
     corpo = "".join([
         sezione("sessioni", "Sessioni", sessioni),
         sezione("luoghi", "Luoghi", luoghi),
         sezione("fazioni", "Fazioni", fazioni),
         sezione("png", "PNG", png),
+        sezione("oggetti", "Oggetti", oggetti),
         sezione("quest", "Quest", quest),
         sezione("timeline", "Timeline", [f'<div class="tl">{"".join(timeline)}</div>'] if timeline else []),
     ])
@@ -96,7 +104,7 @@ def render(c):
 <p>{escape(c.get("descrizione", ""))}</p></header>
 <nav><a href="#sessioni">Sessioni</a><a href="#luoghi">Luoghi</a>
 <a href="#fazioni">Fazioni</a><a href="#png">PNG</a>
-<a href="#quest">Quest</a><a href="#timeline">Timeline</a></nav>
+<a href="#oggetti">Oggetti</a><a href="#quest">Quest</a><a href="#timeline">Timeline</a></nav>
 <main>{corpo}</main></body></html>"""
 
 
